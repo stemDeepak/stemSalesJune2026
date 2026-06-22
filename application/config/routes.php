@@ -75,8 +75,80 @@ $route['chat/get_chat_history'] = 'chat/get_chat_history';
 
 
 
-// API 
+// Mobile / REST API (STEM CRM app)
+$route['auth/api_login'] = 'auth/api_login';
 $route['api/login'] = 'api/auth/login';
+$route['api/auth'] = 'api/auth/login';
+$route['api/auth/login'] = 'api/auth/login';
+$route['api/auth/me'] = 'api/auth/me';
+$route['api/discipline/state'] = 'api/discipline/state';
+$route['api/feature_flags/list'] = 'api/feature_flags/list';
+$route['api/pilot/uids'] = 'api/pilot/uids';
+$route['api/leads'] = 'api/leads/index';
+$route['api/leads/list'] = 'api/leads/index';
+$route['api/dashboard/bd/(:num)'] = 'api/dashboard/bd/$1';
+$route['api/day_ceremony'] = 'api/day_ceremony/status';
+$route['api/day_ceremony/start'] = 'api/day_ceremony/start';
+$route['api/day_ceremony/close'] = 'api/day_ceremony/close';
+$route['api/day_close'] = 'api/day_ceremony/close';
+$route['api/day_ceremony/status'] = 'api/day_ceremony/status';
+$route['api/day_ceremony/geo_context'] = 'api/day_ceremony/geo_context';
+$route['api/callevents'] = 'api/callevents/list';
+$route['api/callevents/list'] = 'api/callevents/list';
+$route['api/task'] = 'api/task/today';
+$route['api/task/today'] = 'api/task/today';
+$route['api/task/detail'] = 'api/task/detail';
+$route['api/task/submit'] = 'api/task/submit';
+$route['api/task/submit_closure'] = 'api/task/submit_closure';
+$route['api/task/submit_closure_timeline'] = 'api/task/submit_closure_timeline';
+$route['api/task/preflight'] = 'api/task/preflight';
+$route['api/task/save_draft'] = 'api/task/save_draft';
+$route['api/meeting/initiate'] = 'api/meeting/initiate';
+$route['api/meeting/start'] = 'api/meeting/start';
+$route['api/meeting/close'] = 'api/meeting/close';
+$route['api/meeting/barge'] = 'api/meeting/barge';
+$route['api/users/active'] = 'api/users/active';
+$route['api/reminder/list'] = 'api/reminder/list';
+$route['api/reminder/create'] = 'api/reminder/create';
+$route['api/reminder/ack'] = 'api/reminder/ack';
+$route['api/me'] = 'api/me/index';
+$route['api/me/role'] = 'api/me/role';
+
+// P2 — Planner
+$route['api/planner/auto_seeded'] = 'api/planner/auto_seeded';
+$route['api/planner/pbni_list'] = 'api/planner/pbni_list';
+$route['api/planner/pending_autotasks'] = 'api/planner/pending_autotasks';
+$route['api/planner/pending_moms'] = 'api/planner/pending_moms';
+$route['api/planner/yesterday_plans'] = 'api/planner/yesterday_plans';
+$route['api/planner/same_day_request'] = 'api/planner/same_day_request';
+$route['api/planner/yesterday_request'] = 'api/planner/yesterday_request';
+$route['api/planner/same_day_decision'] = 'api/planner/same_day_decision';
+$route['api/planner/yesterday_decision'] = 'api/planner/yesterday_decision';
+$route['api/planner/assign_task'] = 'api/planner/assign_task';
+$route['api/planner/v2/pending'] = 'api/planner_v2/pending';
+$route['api/planner/v2/pending/carry'] = 'api/planner_v2/pending_carry';
+$route['api/planner/pending/carry'] = 'api/planner_v2/pending_carry';
+$route['api/planner/v2/leads'] = 'api/planner_v2/leads';
+$route['api/planner/v2/today_not_started'] = 'api/planner_v2/today_not_started';
+$route['api/planner/v2/purposes_v2'] = 'api/planner_v2/purposes_v2';
+
+// P2 — MoM
+$route['api/mom/approval_queue'] = 'api/mom/approval_queue';
+$route['api/mom/templates'] = 'api/mom/templates';
+$route['api/mom/transcribe'] = 'api/mom/transcribe';
+$route['api/mom/approve'] = 'api/mom/approve';
+$route['api/mom/reject'] = 'api/mom/reject';
+$route['api/mom/bulk_approve'] = 'api/mom/bulk_approve';
+
+// P2 — Travel advance
+$route['api/discipline/advance/my'] = 'api/advance/my';
+$route['api/discipline/advance/request'] = 'api/advance/request';
+$route['api/discipline/advance/unsettled'] = 'api/advance/unsettled';
+$route['api/discipline/advance/queue'] = 'api/advance/queue';
+
+// P2 — Anaya (stub briefing)
+$route['api/anaya/briefing'] = 'api/anaya/briefing';
+$route['api/anaya/today'] = 'api/anaya/today';
 
 
 

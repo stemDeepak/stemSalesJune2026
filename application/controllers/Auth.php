@@ -1,6 +1,9 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * Mobile login entry: POST /auth/api_login (FormData or JSON username/password).
+ */
 class Auth extends CI_Controller {
 
     public function __construct()
@@ -11,14 +14,11 @@ class Auth extends CI_Controller {
         $this->load->library('Mobile_api_lib', null, 'api');
     }
 
-    /**
-     * POST api/auth/login
-     */
-    public function login()
+    public function api_login()
     {
         $in = $this->api->input();
-        $username = trim($in['username'] ?? $in['email'] ?? $in['user'] ?? '');
-        $password = trim($in['password'] ?? '');
+        $username = trim($in['username'] ?? $in['email'] ?? $in['user'] ?? $in['mobile'] ?? '');
+        $password = trim($in['password'] ?? $in['otp'] ?? '');
 
         if ($username === '' || $password === '') {
             $this->api->mobile_fail('missing_credentials', 422);
@@ -30,7 +30,6 @@ class Auth extends CI_Controller {
         }
 
         $token = $this->api->issue_token($row);
-        $payload = $this->api->mobile_login_payload($row, $token);
 
         $sess = [
             'id' => (string) $row->id,
@@ -47,29 +46,6 @@ class Auth extends CI_Controller {
             'log_in' => 'yes',
         ]);
 
-        $this->api->mobile_ok($payload);
-    }
-
-    /**
-     * GET /api/auth/me
-     */
-    public function me()
-    {
-        $user = $this->api->require_user();
-        $uid = (int) $user['user_id'];
-        $rows = $this->Menu_model->get_userbyid($uid);
-        $row = !empty($rows) ? $rows[0] : null;
-        if (!$row) {
-            $this->api->mobile_fail('user_not_found', 404);
-        }
-        $this->api->mobile_ok([
-            'uid' => $uid,
-            'user_details_id' => (int) $row->id,
-            'name' => $row->name,
-            'type_id' => (int) $row->type_id,
-            'role' => $this->api->role_for_type($row->type_id),
-            'photo' => $row->photo ?? '',
-            'zone_id' => isset($row->zone_id) ? (int) $row->zone_id : 0,
-        ]);
+        $this->api->mobile_ok($this->api->mobile_login_payload($row, $token));
     }
 }
