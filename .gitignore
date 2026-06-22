@@ -23,6 +23,9 @@
 # Ignore compiled Android APK binaries
 /*.apk
 
+# Ignore local Expo application directory
+/expo_app/
+
 # =========================================================================
 # Environment and Configuration (Credentials & API Keys)
 # =========================================================================
