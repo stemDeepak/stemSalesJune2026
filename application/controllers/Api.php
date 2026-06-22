@@ -1,13 +1,15 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * Legacy Api/login — delegates to same auth as web (user_details).
+ * Prefer POST api/auth/login for mobile clients.
+ */
 class Api extends CI_Controller {
 
     public function __construct()
     {
         parent::__construct();
-
-        // CORS (must be inside constructor, not top)
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: Content-Type, Authorization");
         header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
@@ -20,49 +22,23 @@ class Api extends CI_Controller {
 
     public function login()
     {
-        header('Content-Type: application/json');
+        $this->load->model('Menu_model');
+        $this->load->library('Mobile_api_lib', null, 'mobile');
 
-        $username = trim($this->input->post('username'));
-        $password = trim($this->input->post('password'));
+        $in = $this->mobile->input();
+        $username = trim($in['username'] ?? $this->input->post('username') ?? '');
+        $password = trim($in['password'] ?? $this->input->post('password') ?? '');
 
-        if(empty($username) || empty($password)){
-            echo json_encode([
-                'status' => false,
-                'message' => 'Username and Password Required'
-            ]);
-            return;
+        if ($username === '' || $password === '') {
+            $this->mobile->mobile_fail('missing_credentials', 422);
         }
 
-        // IMPORTANT FIX: password should be compared properly
-        $check = $this->db
-            ->where('username', $username)
-            ->where('password', $password)
-            ->get('user_details');
-
-        if($check->num_rows() > 0){
-
-            $user = $check->row();
-
-            echo json_encode([
-                'status' => true,
-                'message' => 'Login Success',
-                'data' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'photo' => $user->photo,
-                    'type_id' => $user->type_id,
-                    'user_id' => $user->user_id
-                ]
-            ]);
-
-        } else {
-
-            echo json_encode([
-                'status' => false,
-                'message' => 'Invalid Login Credentials'
-            ]);
-
+        $row = $this->Menu_model->user_login_check($username, $password);
+        if (empty($row)) {
+            $this->mobile->mobile_fail('invalid_credentials', 401);
         }
+
+        $token = $this->mobile->issue_token($row);
+        $this->mobile->mobile_ok($this->mobile->mobile_login_payload($row, $token));
     }
 }
