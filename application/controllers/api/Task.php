@@ -16,11 +16,8 @@ class Task extends CI_Controller {
     public function today()
     {
         $user = $this->api->require_user();
-        $uid = (int) $user['user_id'];
         $in = $this->api->input();
-        if (!empty($in['uid'])) {
-            $uid = (int) $in['uid'];
-        }
+        $uid = $this->api->resolve_request_uid($user, $in);
         $tdate = $in['date'] ?? $in['tdate'] ?? date('Y-m-d');
 
         $rows = $this->Menu_model->get_totalt($uid, $tdate);
@@ -93,7 +90,7 @@ class Task extends CI_Controller {
             $hard[] = ['code' => 'day_start', 'label' => 'Start your day first', 'fix_route' => 'DayCeremony'];
         }
         if ($disc['pending_autotask_count'] > 0) {
-            $hard[] = ['code' => 'autotasks', 'label' => 'Complete pending auto tasks', 'fix_route' => 'AutoTasks'];
+            $hard[] = ['code' => 'autotasks', 'label' => 'Complete pending auto tasks', 'fix_route' => 'DayManagement'];
         }
         $this->api->mobile_ok([
             'hard_gates' => $hard,

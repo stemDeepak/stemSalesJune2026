@@ -86,6 +86,7 @@ $route['api/feature_flags/list'] = 'api/feature_flags/list';
 $route['api/pilot/uids'] = 'api/pilot/uids';
 $route['api/leads'] = 'api/leads/index';
 $route['api/leads/list'] = 'api/leads/index';
+$route['api/lead/detail/(:num)'] = 'api/leads/detail/$1';
 $route['api/dashboard/bd/(:num)'] = 'api/dashboard/bd/$1';
 $route['api/day_ceremony'] = 'api/day_ceremony/status';
 $route['api/day_ceremony/start'] = 'api/day_ceremony/start';
@@ -139,6 +140,8 @@ $route['api/mom/transcribe'] = 'api/mom/transcribe';
 $route['api/mom/approve'] = 'api/mom/approve';
 $route['api/mom/reject'] = 'api/mom/reject';
 $route['api/mom/bulk_approve'] = 'api/mom/bulk_approve';
+$route['api/mom_v2/queue'] = 'api/mom/queue';
+$route['api/lead/detail/(:num)'] = 'api/leads/detail/$1';
 
 // P2 — Travel advance
 $route['api/discipline/advance/my'] = 'api/advance/my';
@@ -161,3 +164,11 @@ $route['mcp/tools/call']       = 'mcp/tools_call';
 $route['mcp/oauth/register']   = 'mcp/oauth_register';
 $route['mcp/oauth/authorize']  = 'mcp/oauth_authorize';
 $route['mcp/oauth/token']      = 'mcp/oauth_token';
+
+/* Mobile API parity — load LAST (wins over staging catch-alls) */
+if (file_exists(__DIR__ . '/routes_gate_fix_20260622.php')) {
+    include __DIR__ . '/routes_gate_fix_20260622.php';
+}
+if (file_exists(__DIR__ . '/routes_parity_20260622.php')) {
+    include __DIR__ . '/routes_parity_20260622.php';
+}

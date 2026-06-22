@@ -13,17 +13,22 @@ class Mom extends CI_Controller {
     public function approval_queue()
     {
         $user = $this->api->require_user();
-        $uid = (int) ($this->api->input()['uid'] ?? $user['user_id']);
+        $in = $this->api->input();
+        $cm_uid = (int) ($in['cm_uid'] ?? $in['uid'] ?? $user['user_id']);
         $q = $this->db->query("
             SELECT mom_data.id, mom_data.tid, mom_data.approved_status,
-                   company_master.compname AS cname
+                   company_master.compname AS cname,
+                   tblcallevents.user_id AS bd_uid
             FROM mom_data
-            LEFT JOIN tblcallevents ON tblcallevents.id = mom_data.tid
+            INNER JOIN tblcallevents ON tblcallevents.id = mom_data.tid
+            INNER JOIN user_details bd ON bd.user_id = tblcallevents.user_id
             LEFT JOIN init_call ON init_call.id = tblcallevents.cid_id
             LEFT JOIN company_master ON company_master.id = init_call.cmpid_id
-            WHERE mom_data.approved_status IS NULL
+            WHERE (mom_data.approved_status IS NULL OR mom_data.approved_status = '')
+              AND bd.admin_id = ?
+            ORDER BY mom_data.id DESC
             LIMIT 100
-        ");
+        ", [$cm_uid]);
         $rows = [];
         foreach ($q->result() as $r) {
             $rows[] = [
@@ -31,9 +36,16 @@ class Mom extends CI_Controller {
                 'mom_id' => (int) $r->id,
                 'tid' => (int) $r->tid,
                 'cname' => $r->cname,
+                'bd_uid' => (int) $r->bd_uid,
             ];
         }
         $this->api->mobile_ok(['rows' => $rows, 'count' => count($rows)]);
+    }
+
+    /** APK alias: GET /api/mom_v2/queue?cm_uid= */
+    public function queue()
+    {
+        return $this->approval_queue();
     }
 
     public function templates()

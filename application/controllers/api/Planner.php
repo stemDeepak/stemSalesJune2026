@@ -13,8 +13,9 @@ class Planner extends CI_Controller {
     public function auto_seeded()
     {
         $user = $this->api->require_user();
-        $uid = (int) ($this->api->input()['uid'] ?? $user['user_id']);
-        $rows = $this->Menu_model->get_PendingAutoTaskForToday($uid);
+        $in = $this->api->input();
+        $uid = $this->api->resolve_request_uid($user, $in);
+        $rows = $this->api->pending_autotask_rows($uid);
         $out = [];
         foreach ($rows as $r) {
             $out[] = $this->api->format_task_row($r);
@@ -25,7 +26,7 @@ class Planner extends CI_Controller {
     public function pbni_list()
     {
         $user = $this->api->require_user();
-        $uid = (int) ($this->api->input()['uid'] ?? $user['user_id']);
+        $uid = $this->api->resolve_request_uid($user, $this->api->input());
         $rows = $this->Menu_model->get_OLDPendingTask($uid);
         $out = [];
         foreach ($rows as $r) {
@@ -42,7 +43,7 @@ class Planner extends CI_Controller {
     public function pending_moms()
     {
         $user = $this->api->require_user();
-        $uid = (int) ($this->api->input()['uid'] ?? $user['user_id']);
+        $uid = $this->api->resolve_request_uid($user, $this->api->input());
         $q = $this->db->query("
             SELECT tblcallevents.id AS tid, tblcallevents.cid_id, company_master.compname
             FROM tblcallevents
@@ -92,12 +93,23 @@ class Planner extends CI_Controller {
     {
         $user = $this->api->require_user();
         $in = $this->api->input();
-        $uid = (int) ($in['uid'] ?? $user['user_id']);
+        $uid = $this->api->resolve_request_uid($user, $in);
+        $date = $in['date'] ?? date('Y-m-d');
+        $remarks = trim($in['reason'] ?? $in['remarks'] ?? '');
+        $count = count($this->api->pending_autotask_rows($uid));
+        $this->db->insert('create_planner_request', [
+            'request_user_id' => $uid,
+            'request_type' => 'same_day',
+            'request_date' => $date,
+            'task_count' => $count,
+            'request_remarks' => $remarks,
+        ]);
         $this->api->mobile_ok([
+            'ok' => true,
             'uid' => $uid,
-            'date' => $in['date'] ?? date('Y-m-d'),
+            'date' => $date,
+            'request_id' => (int) $this->db->insert_id(),
             'submitted' => true,
-            'message' => 'Same-day request recorded (git bridge). CM approval flow pending full implementation.',
         ]);
     }
 
@@ -105,26 +117,48 @@ class Planner extends CI_Controller {
     {
         $user = $this->api->require_user();
         $in = $this->api->input();
-        $uid = (int) ($in['uid'] ?? $user['user_id']);
+        $uid = $this->api->resolve_request_uid($user, $in);
+        $req_date = $in['req_date'] ?? $in['date'] ?? date('Y-m-d', strtotime('-1 day'));
+        $remarks = trim($in['reason'] ?? $in['remarks'] ?? '');
+        $pbni = $this->Menu_model->get_OLDPendingTask($uid);
+        $count = is_array($pbni) ? count($pbni) : 0;
+        $this->db->insert('create_planner_request', [
+            'request_user_id' => $uid,
+            'request_type' => 'pbni_clear',
+            'request_date' => $req_date,
+            'task_count' => $count,
+            'request_remarks' => $remarks,
+        ]);
         $this->api->mobile_ok([
+            'ok' => true,
             'uid' => $uid,
-            'req_date' => $in['req_date'] ?? date('Y-m-d', strtotime('-1 day')),
+            'req_date' => $req_date,
+            'request_id' => (int) $this->db->insert_id(),
             'submitted' => true,
         ]);
     }
 
     public function same_day_decision()
     {
-        $this->api->require_user();
+        $user = $this->api->require_user();
         $in = $this->api->input();
-        $this->api->mobile_ok(['decision' => $in['decision'] ?? 'Approved', 'ok' => true]);
+        $req_id = (int) ($in['request_id'] ?? $in['id'] ?? 0);
+        $decision = $in['decision'] ?? $in['action'] ?? 'Approved';
+        if ($req_id > 0) {
+            $this->db->where('id', $req_id);
+            $this->db->update('create_planner_request', [
+                'approved' => ($decision === 'Approved' || $decision === 'approve') ? 1 : 0,
+                'approved_by' => (int) $user['user_id'],
+                'approved_date' => date('Y-m-d H:i:s'),
+                'approved_message' => $in['remarks'] ?? '',
+            ]);
+        }
+        $this->api->mobile_ok(['decision' => $decision, 'ok' => true, 'request_id' => $req_id]);
     }
 
     public function yesterday_decision()
     {
-        $this->api->require_user();
-        $in = $this->api->input();
-        $this->api->mobile_ok(['decision' => $in['decision'] ?? 'Approved', 'ok' => true]);
+        return $this->same_day_decision();
     }
 
     public function assign_task()

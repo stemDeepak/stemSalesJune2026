@@ -17,25 +17,34 @@ class Menu_model extends CI_Model{
 
      public function user_login_check($user, $pwd)
     {
+        $needle = strtolower(trim((string) $user));
         $query = $this->db
-            ->select('id,name,zone_id,email,photo,type_id,user_id,admin_id,password')
+            ->select('id,name,zone_id,email,photo,type_id,user_id,admin_id,password,username')
             ->from('user_details')
-            ->where('username', $user)
             ->where('status', 'active')
+            ->where('LOWER(username)', $needle)
             ->limit(1)
             ->get();
 
         $row = $query->row();
 
-        // If user found
-        if(!empty($row))
-        {
-           if ((string)$pwd == (string)$row->password) 
-            {
-                return $row;
-            }
+        if (!empty($row) && $this->_password_matches($pwd, $row->password)) {
+            return $row;
         }
 
+        return false;
+    }
+
+    protected function _password_matches($pwd, $stored)
+    {
+        $pwd = (string) $pwd;
+        $stored = trim((string) $stored);
+        if ($pwd === $stored) {
+            return true;
+        }
+        if ($stored !== '' && md5($pwd) === $stored) {
+            return true;
+        }
         return false;
     }
 

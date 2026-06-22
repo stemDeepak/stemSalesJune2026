@@ -20,7 +20,7 @@ class Anaya extends CI_Controller {
             'uid' => $uid,
             'summary' => 'You have ' . count($tasks) . ' open tasks today.',
             'task_count' => count($tasks),
-            'stub' => true,
+            'open_tasks' => count($tasks),
         ]);
     }
 

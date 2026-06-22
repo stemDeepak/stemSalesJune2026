@@ -17,8 +17,9 @@ class Discipline extends CI_Controller {
     {
         $user = $this->api->require_user();
         $in = $this->api->input();
-        $uid = (int) ($in['uid'] ?? $user['user_id']);
+        $uid = $this->api->resolve_request_uid($user, $in);
+        $type_id = (int) ($user['type_id'] ?? 0);
         $tdate = $in['date'] ?? $in['tdate'] ?? date('Y-m-d');
-        $this->api->mobile_ok($this->api->build_discipline_state($uid, $tdate));
+        $this->api->mobile_ok($this->api->build_discipline_state($uid, $tdate, $type_id));
     }
 }
