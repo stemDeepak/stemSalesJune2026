@@ -17,6 +17,9 @@
 # Ignore temporary/test database connection scripts
 /test_db.php
 
+# Ignore database backup files (too large for GitHub and contains sensitive data)
+/Database_BKP/
+
 # =========================================================================
 # Environment and Configuration (Credentials & API Keys)
 # =========================================================================
