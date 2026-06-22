@@ -20,6 +20,9 @@
 # Ignore database backup files (too large for GitHub and contains sensitive data)
 /Database_BKP/
 
+# Ignore compiled Android APK binaries
+/*.apk
+
 # =========================================================================
 # Environment and Configuration (Credentials & API Keys)
 # =========================================================================
