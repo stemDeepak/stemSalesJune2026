@@ -1,0 +1,10 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+$config['deepseek_api_key'] = 'YOUR_DEEPSEEK_API_KEY';
+$config['deepseek_api_url'] = 'https://api.deepseek.com/chat/completions';
+$config['deepseek_model'] = 'deepseek-chat';
+$config['deepseek_max_tokens'] = 32000;
+$config['deepseek_timeout'] = 120;
+$config['deepseek_max_input_tokens'] = 128000;
+?>

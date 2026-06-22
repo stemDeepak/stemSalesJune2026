@@ -1,0 +1,57 @@
+# =========================================================================
+# CodeIgniter .gitignore
+# =========================================================================
+
+# Ignore system logs (very large files, total ~3-4GB in this workspace)
+/application/logs/log-*.php
+/application/logs/*.log
+
+# Ignore cache files and sessions
+/application/cache/*
+!/application/cache/index.html
+!/application/cache/.htaccess
+
+# Ignore vendor/ folder (Composer dependencies)
+/vendor/
+
+# Ignore temporary/test database connection scripts
+/test_db.php
+
+# =========================================================================
+# Environment and Configuration (Credentials & API Keys)
+# =========================================================================
+# It is highly recommended to ignore files containing credentials to prevent
+# them from being pushed to a public/private repository.
+# Template files (*.example) have been created for reference.
+
+/application/config/database.php
+/application/config/email.php
+/application/config/openai.php
+/application/config/deepseek.php
+
+# =========================================================================
+# OS / IDE / Build Tool specific files
+# =========================================================================
+
+# Windows thumbnail databases and metadata
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# IDE/Editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
